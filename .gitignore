@@ -1,4 +1,4 @@
-/target/
-/bin/
+**/target
+**/bin
 .classpath
 .settings/
