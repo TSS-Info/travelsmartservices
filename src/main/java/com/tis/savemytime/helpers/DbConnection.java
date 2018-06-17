@@ -8,17 +8,22 @@ import java.sql.SQLException;
 
 public class DbConnection {
 
-	public Connection getConnection() throws Exception {
+	public Connection getConnection() {
 		try {
 			String connectionURL = PropertiesHelper.getPropertyValue("jdbc_url");
+			System.out.println("jdbc url::"+connectionURL);
 			Connection connection = null;
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			connection = DriverManager.getConnection(connectionURL, PropertiesHelper.getPropertyValue("jdbc_username"), PropertiesHelper.getPropertyValue("jdbc_password"));
+			String jdbcUsername = PropertiesHelper.getPropertyValue("jdbc_username");
+			String jdbcPassword = PropertiesHelper.getPropertyValue("jdbc_password");
+			connection = DriverManager.getConnection(connectionURL, jdbcUsername, jdbcPassword);
 			return connection;
 		} catch (SQLException e) {
-			throw e;
+			e.printStackTrace();
+			return null;
 		} catch (Exception e) {
-			throw e;
+			e.printStackTrace();
+			return null;
 		}
 	}
 
