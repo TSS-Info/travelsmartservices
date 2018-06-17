@@ -59,6 +59,7 @@ public class UserService {
  		return user;
     }
     
+    
 	@GET
     @Path("getUserBasedID/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -82,7 +83,8 @@ public class UserService {
  		} 
  		return user;
     }
-
+	
+	
 	@POST
 	@Path("/create")
 	@Consumes(MediaType.APPLICATION_JSON)
