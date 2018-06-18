@@ -22,6 +22,21 @@ public class User implements Serializable{
 	private int addressID;
 	private int identityID;
 	private int cardID;
+	private String emailLink;
+	private String mobileNo;
+	
+	public String getMobileNo() {
+		return mobileNo;
+	}
+	public void setMobileNo(String mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+	public String getEmailLink() {
+		return emailLink;
+	}
+	public void setEmailLink(String emailLink) {
+		this.emailLink = emailLink;
+	}
 	
 	public int getUserID() {
 		return userID;

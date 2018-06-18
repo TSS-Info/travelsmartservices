@@ -59,6 +59,33 @@ public class UserService {
  		return user;
     }
     
+    @POST
+    @Path("/sendemail")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Status sendemail(User user){
+    		Status status = new Status();
+		try {
+			connection = database.getConnection();
+			status =  userHandler.sendVerificationEmail(connection, user,user.getEmailLink());
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		} 
+ 		finally {
+ 			try 
+ 			{
+ 				if(connection!= null)
+ 					connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+ 		} 
+ 		return status;
+    }
     
 	@GET
     @Path("getUserBasedID/{id}")
