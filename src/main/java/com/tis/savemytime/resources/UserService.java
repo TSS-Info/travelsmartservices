@@ -17,6 +17,7 @@ import com.tis.savemytime.helpers.DbConnection;
 import com.tis.savemytime.helpers.UserHandler;
 import com.tis.savemytime.models.Status;
 import com.tis.savemytime.models.User;
+import com.tis.savemytime.models.VerifyBean;
 
 
 @Path("/userservice")
@@ -82,6 +83,38 @@ public class UserService {
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+ 		} 
+ 		return status;
+    }
+    
+    @POST
+    @Path("/verifyemail")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Status verifyEmail(VerifyBean verifyBean){
+    		Status status = new Status();
+		try {
+			connection = database.getConnection();
+			status =  userHandler.verifyEmail(connection, verifyBean.getUserId(), verifyBean.getAccessToken());	
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			status.setMessage("exception.."+e.getMessage());
+			status.setStatus("Failure");
+			status.setStatusCode("500");
+		} 
+ 		finally {
+ 			try 
+ 			{
+ 				if(connection!= null)
+ 					connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				status.setMessage("exception.."+e.getMessage());
+				status.setStatus("Failure");
+				status.setStatusCode("500");
 			}
  		} 
  		return status;

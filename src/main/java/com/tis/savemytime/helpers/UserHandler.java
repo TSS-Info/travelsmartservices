@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -111,6 +112,17 @@ public class UserHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}
+		finally {
+			if(connection!=null) {
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return null;
+				}
+			}
 		}
 	}
 
@@ -274,6 +286,81 @@ public class UserHandler {
 	        token.append(CHARS.charAt(random.nextInt(CHARS.length())));
 	    }
 	    return token.toString();
+	}
+
+	public Status verifyEmail(Connection connection, String userId, String accessToken) {
+		// TODO Auto-generated method stub
+		Status status = this.getTokenFromDB(connection, userId);
+		
+		if(status.getStatusCode().equalsIgnoreCase("200") ) {
+			if(status.getStatus().equalsIgnoreCase(accessToken)) {
+				status = this.updateRegistrationSuccess(connection, userId, status.getMessage());
+			}
+			else {
+				status.setStatusCode("2101");
+				status.setMessage("Invalid token!!");
+				status.setStatus("Failure");
+			}
+		}
+		
+		
+		return status;
+	}
+
+	private Status updateRegistrationSuccess(Connection connection, String userId, String createdDate) {
+		// TODO Auto-generated method stub
+		Status status = new Status();
+		try {
+			
+			PreparedStatement ps = connection.prepareStatement("update user_verification set remarks = concat('success - ', now()), EMAIL_LINK_CHK = 'Y' where user_id=? and created_date = ?");
+			ps.setString(1, userId);
+			ps.setString(2, createdDate);
+			
+			int i = ps.executeUpdate();
+			if(i>0)
+			{
+				status.setStatusCode("200");
+				status.setMessage("Updated your registration verification status");
+				status.setStatus("Success");
+			}
+			else {
+				status.setStatusCode("200");
+				status.setMessage("No records found or something went wrong..");
+				status.setStatus("Failure");
+			}
+			return status;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status.setStatus("500");
+			status.setMessage("SQL Exception 338:"+e.getMessage());
+			status.setStatus("Failure");
+			return status;
+		}
+	}
+	
+	private Status getTokenFromDB(Connection connection, String userId) {
+		// TODO Auto-generated method stub
+		Status status = new Status();
+		try {
+			
+			PreparedStatement ps = connection.prepareStatement("SELECT access_token,created_date FROM savemytime.USER_VERIFICATION where user_id="+userId+" and EMAIL_LINK_CHK='N' order by CREATED_DATE desc");
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				 status.setStatus(rs.getString("access_token"));
+				 status.setMessage(rs.getString("created_date"));
+				 status.setStatusCode("200");
+			}
+			else {
+				status.setStatusCode("2103");
+				status.setMessage("Already verified");
+				status.setStatus("Failure");
+			}
+		} catch (Exception e) {
+			status.setStatus("500");
+			status.setMessage("SQL Exception 358:"+e.getMessage());
+			status.setStatus("Failure");
+		}
+		return status;
 	}
 	
 }

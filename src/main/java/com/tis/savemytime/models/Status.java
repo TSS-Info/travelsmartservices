@@ -17,8 +17,17 @@ public class Status implements Serializable {
 	
 	private String status;
     private String message;
+    private String statusCode;
     
-    public Status() {} // needed for JAXB
+    public String getStatusCode() {
+		return statusCode;
+	}
+
+	public void setStatusCode(String statusCode) {
+		this.statusCode = statusCode;
+	}
+
+	public Status() {} // needed for JAXB
     
     public Status(String status, String message) {
         this.status = status;
