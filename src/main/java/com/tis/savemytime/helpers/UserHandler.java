@@ -10,15 +10,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
-import javax.mail.Authenticator;
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
 import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 import com.tis.savemytime.models.Status;
 import com.tis.savemytime.models.User;
@@ -28,7 +21,7 @@ public class UserHandler {
 
 	public boolean saveUser(Connection connection, User user) throws Exception {
 		try {
-			String query = "insert into user(FIRST_NAME,LAST_NAME,USER_NAME,PASSWORD, PASSWORD_CREATION_DATE,DISTRICT_VILLAGE_NAME,UPDATE_STAMP,ADDRESS_ID,IDIDENTITY,card_id,mobileNo) values(?,?,?,?,?,?,?,?,?,?,?)";
+			String query = "insert into user(FIRST_NAME,LAST_NAME,USER_NAME,PASSWORD, PASSWORD_CREATION_DATE,DISTRICT_VILLAGE_NAME,UPDATE_STAMP,ADDRESS_ID,IDIDENTITY,card_id,mobileNo, dob) values(?,?,?,?,?,?,?,?,?,?,?,?)";
 			
 			PreparedStatement ps = null;
 			
@@ -45,7 +38,8 @@ public class UserHandler {
 			ps.setInt(8, user.getAddressID());
 			ps.setInt(9, user.getIdentityID());
 			ps.setInt(10, user.getCardID());
-			ps.setString(11, user.getUserName());
+			ps.setString(11, user.getMobileNo());
+			ps.setString(12, user.getDob());
 			
 			ps.executeUpdate();
 			return true;
@@ -166,7 +160,7 @@ public class UserHandler {
 			
 			try {
 				try {
-					status = UserHandler.sendEmail(noReplyID,noReplyIDMSG,sslEnable, hostname, hostPort, fromEmail, toEmail, emailSubject, body, password);
+					status = EmailHandler.sendEmail(noReplyID,noReplyIDMSG,sslEnable, hostname, hostPort, fromEmail, toEmail, emailSubject, body, password);
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
 					status.setMessage(" Unsupported encoding.."+e.getMessage());
@@ -186,59 +180,7 @@ public class UserHandler {
 		return status;
 	}
 	
-	public static Status sendEmail(String noReplyID, String noReplyIDMSG, String sslEnable, String smtpHost, int smtpPort, String from, String to, String subject,
-		      String content, String password) throws AddressException, MessagingException, UnsupportedEncodingException {
-			Status status = new Status();
-		    java.util.Properties props = new java.util.Properties();
-		    props.put("mail.smtp.host", smtpHost);
-		    props.put("mail.smtp.port", "" + smtpPort);
-		    if("true".equalsIgnoreCase(sslEnable))
-		    		props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
-			
-		    Session session = UserHandler.getAuthSession(smtpHost, smtpPort, password, from);
-
-		    MimeMessage msg = new MimeMessage(session);
-		      //set message headers
-		      msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-		      msg.addHeader("format", "flowed");
-		      msg.addHeader("Content-Transfer-Encoding", "8bit");
-
-		      msg.setFrom(new InternetAddress(noReplyID, noReplyIDMSG));
-
-		      msg.setReplyTo(InternetAddress.parse(noReplyID, false));
-
-		      msg.setSubject(subject, "UTF-8");
-
-		      msg.setContent(content, "text/html");
-
-		      msg.setSentDate(new Date());
-
-		      msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
-	    	  Transport.send(msg);
-	    	  status.setMessage("Successfully sent an email");
-	    	  status.setStatus("Success");
-		    return status;
-	}
 	
-	private static Session getAuthSession(String smtpHost, int smtpPort, String password, String fromEmail) {
-		
-                //create Authenticator object to pass in Session.getInstance argument
-		java.util.Properties props = new java.util.Properties();
-	    props.put("mail.smtp.host", smtpHost);
-	    props.put("mail.smtp.port", "" + smtpPort);
-	    props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
-	    props.put("mail.smtp.auth", "true"); 
-	    
-		Authenticator auth = new Authenticator() {
-			//override the getPasswordAuthentication method
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(fromEmail, password);
-			}
-		};
-		Session session = Session.getInstance(props, auth);
-		
-		return session;
-	}
 	private static long add(Date date, int calendarField, int amount) {
 	      if (date == null) {
 	          throw new IllegalArgumentException("The date must not be null");
@@ -253,7 +195,7 @@ public class UserHandler {
 	{
 		Status status = new Status();
 		try {
-			String query = "insert into user_verification(USER_ID,ACCESS_TOKEN,EMAIL_LINK_CHK,ACCESS_TOKEN_EXP,SMS_CHK,CREATED_DATE) values(?,?,?,?,?,now())";
+			String query = "insert into USER_VERIFICATION(USER_ID,ACCESS_TOKEN,EMAIL_LINK_CHK,ACCESS_TOKEN_EXP,SMS_CHK,CREATED_DATE) values(?,?,?,?,?,now())";
 			
 			PreparedStatement ps = null;
 			
@@ -312,7 +254,7 @@ public class UserHandler {
 		Status status = new Status();
 		try {
 			
-			PreparedStatement ps = connection.prepareStatement("update user_verification set remarks = concat('success - ', now()), EMAIL_LINK_CHK = 'Y' where user_id=? and created_date = ?");
+			PreparedStatement ps = connection.prepareStatement("update USER_VERIFICATION set remarks = concat('success - ', now()), EMAIL_LINK_CHK = 'Y' where user_id=? and created_date = ?");
 			ps.setString(1, userId);
 			ps.setString(2, createdDate);
 			
@@ -343,7 +285,7 @@ public class UserHandler {
 		Status status = new Status();
 		try {
 			
-			PreparedStatement ps = connection.prepareStatement("SELECT access_token,created_date FROM savemytime.USER_VERIFICATION where user_id="+userId+" and EMAIL_LINK_CHK='N' order by CREATED_DATE desc");
+			PreparedStatement ps = connection.prepareStatement("SELECT access_token,created_date FROM USER_VERIFICATION where user_id="+userId+" and EMAIL_LINK_CHK='N' order by CREATED_DATE desc");
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				 status.setStatus(rs.getString("access_token"));
@@ -361,6 +303,64 @@ public class UserHandler {
 			status.setStatus("Failure");
 		}
 		return status;
+	}
+
+	public Status checkUsername(Connection connection, String userName) {
+		// TODO Auto-generated method stub
+		
+		Status status = new Status();
+		try {
+			PreparedStatement ps = connection.prepareStatement("SELECT * FROM USER where USER_NAME='"+userName+"'");
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				status.setMessage("User already exists");
+				status.setStatus("Failure");
+				status.setStatusCode("200");
+			}
+			else {
+				status.setMessage("User not available");
+				status.setStatus("Sucess");
+				status.setStatusCode("200");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			status.setMessage("Something went wrong.."+e.getMessage());
+			status.setStatus("Failure");
+			status.setStatusCode("500");
+		}
+		return status;
+	}
+
+	public Status forgotUserName(Connection connection, User user) {
+		// TODO Auto-generated method stub
+		//user name will be find based on the first name and dob
+		
+		Status status = new Status();
+		try {
+			PreparedStatement ps = connection.prepareStatement("SELECT USER_NAME FROM USER where FIRST_NAME='"+user.getFirstName()+"' AND dob='"+user.getDob()+"'");
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				status.setMessage(rs.getString("USER_NAME"));
+				status.setStatus("Sucess");
+				status.setStatusCode("200");
+			}
+			else {
+				status.setMessage("Details are not matched with backend");
+				status.setStatus("Failure");
+				status.setStatusCode("FU404");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			status.setMessage("Something went wrong.."+e.getMessage());
+			status.setStatus("Failure");
+			status.setStatusCode("500");
+		}
+		return status;
+	}
+
+	public Status forgotPassword(Connection connection, User user) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

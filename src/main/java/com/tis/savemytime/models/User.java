@@ -24,7 +24,14 @@ public class User implements Serializable{
 	private int cardID;
 	private String emailLink;
 	private String mobileNo;
+	private String dob;
 	
+	public String getDob() {
+		return dob;
+	}
+	public void setDob(String dob) {
+		this.dob = dob;
+	}
 	public String getMobileNo() {
 		return mobileNo;
 	}

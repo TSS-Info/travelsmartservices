@@ -89,6 +89,63 @@ public class UserService {
     }
     
     @POST
+    @Path("/forgotusername")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Status forgotUserName(User user){
+    		Status status = new Status();
+		try {
+			connection = database.getConnection();
+			status =  userHandler.forgotUserName(connection, user);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		} 
+ 		finally {
+ 			try 
+ 			{
+ 				if(connection!= null)
+ 					connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+ 		} 
+ 		return status;
+    }
+    
+    
+    @POST
+    @Path("/forgotpassword")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Status forgotPassword(User user){
+    		Status status = new Status();
+		try {
+			connection = database.getConnection();
+			status =  userHandler.forgotPassword(connection, user);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		} 
+ 		finally {
+ 			try 
+ 			{
+ 				if(connection!= null)
+ 					connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+ 		} 
+ 		return status;
+    }
+    
+    @POST
     @Path("/verifyemail")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -121,17 +178,16 @@ public class UserService {
     }
     
 	@GET
-    @Path("getUserBasedID/{id}")
+    @Path("checkUsername/{userName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public User getUserBasedID(@PathParam("id") int id){
-		User user =  null;
+    public Status checkUsername(@PathParam("userName") String userName){
+		Status status = null;
  		try {
 			connection = database.getConnection();
-			user =  userHandler.getUserByID(connection, id);
+			status =  userHandler.checkUsername(connection, userName);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return user;
 		} 
  		finally {
  			try {
@@ -141,7 +197,7 @@ public class UserService {
 				e.printStackTrace();
 			}
  		} 
- 		return user;
+ 		return status;
     }
 	
 	
