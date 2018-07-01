@@ -2,6 +2,7 @@ package com.tis.savemytime.resources;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Date;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -27,11 +28,12 @@ public class UserService {
 	private DbConnection database;
     private Connection connection;
     private UserHandler userHandler;
-   
+    private Date todayDate;
     public UserService()
     {
     		database = new DbConnection();
     		userHandler = new UserHandler();
+    		todayDate = new Date();
     }
     
     @POST
@@ -42,9 +44,10 @@ public class UserService {
 		try {
 			connection = database.getConnection();
 			user =  userHandler.authenticateUser(connection, user);
+			logger.debug(user.getUserName()+" has been logged at "+todayDate);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e);
 			return user;
 		} 
  		finally {

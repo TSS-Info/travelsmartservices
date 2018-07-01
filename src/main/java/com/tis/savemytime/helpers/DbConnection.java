@@ -4,10 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
+
 
 
 public class DbConnection {
 
+	private static final Logger logger = Logger.getLogger(DbConnection.class);
+	
 	public Connection getConnection() {
 		try {
 			String connectionURL = PropertiesHelper.getPropertyValue("jdbc_url");
@@ -19,10 +23,10 @@ public class DbConnection {
 			connection = DriverManager.getConnection(connectionURL, jdbcUsername, jdbcPassword);
 			return connection;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error(e);
 			return null;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 			return null;
 		}
 	}

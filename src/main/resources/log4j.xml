@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration>
+
+	<!--  appender name="file" class="org.apache.log4j.RollingFileAppender">
+	   <param name="append" value="false" />
+	   <param name="maxFileSize" value="10KB" />
+	   <param name="maxBackupIndex" value="5" />
+	   <param name="file" value="../logs/savemytime.log" />
+	   <layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" 
+			value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
+	   </layout>
+	   <filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="ERROR" />
+			<param name="LevelMax" value="FATAL" />
+		</filter>
+	</appender-->
+	
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- 
+			<param name="ConversionPattern"
+				value="[%d{ISO8601}] %-5p [%c] %m %n" />
+			-->
+			<param name="ConversionPattern" value="%-5p [%c] %m %n" />
+		</layout>
+	</appender>
+	
+	<appender name="STDERR" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.err" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="[%d{ISO8601}] %-5p [%c] %m %n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+			<param name="LevelMax" value="FATAL" />
+		</filter>
+	</appender>
+	
+	<appender name="SW_ROLLING_FILE"
+		class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="../logs/savemytime.log" />
+		<param name="Append" value="true" />
+		<param name="MaxFileSize" value="500KB" />
+		<param name="MaxBackupIndex" value="5" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="[%d{ISO8601}] %-5p %m%n" />
+		</layout>
+	</appender>
+
+	<!--                          -->
+	<!-- Declare the SMTPAppender -->
+	<!--                          -->
+	
+	<appender name="EMAIL" class="org.apache.log4j.net.SMTPAppender">
+		<param name="BufferSize" value="512" />
+		<param name="SMTPHost" value="mail.tssinfo.heliohost.org" />
+		<param name="From" value="_mainaccount@tssinfo.heliohost.org" />
+		<param name="To" value="tssinfo@yahoo.com" />
+		<param name="Subject"
+			value="[SMTPAppender] Log Error" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="[%d{ISO8601}]%n%n%-5p%n%n%c%n%n%m%n%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+			<param name="LevelMax" value="FATAL" />
+		</filter>
+	</appender>
+	 
+
+    <logger name="com.tis" additivity="false">
+		<level value="trace" />
+		<appender-ref ref="SW_ROLLING_FILE" />
+		<!--  appender-ref ref="file" /-->
+	</logger>
+		
+	<!-- ** -->
+	
+	<root>
+		<level value="ERROR" />
+		<appender-ref ref="STDERR" />
+		<appender-ref ref="EMAIL" /> 
+	</root>
+
+
+</log4j:configuration>

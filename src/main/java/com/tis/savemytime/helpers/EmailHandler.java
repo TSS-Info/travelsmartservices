@@ -13,9 +13,13 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.log4j.Logger;
+
 import com.tis.savemytime.models.Status;
 
 public class EmailHandler {
+	
+	private static final Logger logger = Logger.getLogger(EmailHandler.class);
 	
 	public static Status sendEmail(String noReplyID, String noReplyIDMSG, String sslEnable, String smtpHost, int smtpPort, String from, String to, String subject,
 		      String content, String password) throws AddressException, MessagingException, UnsupportedEncodingException {
@@ -27,7 +31,7 @@ public class EmailHandler {
 		    		props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
 			
 		    Session session = EmailHandler.getAuthSession(smtpHost, smtpPort, password, from);
-
+		    logger.debug("Session has been created successfully");
 		    MimeMessage msg = new MimeMessage(session);
 		      //set message headers
 		      msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
@@ -46,6 +50,7 @@ public class EmailHandler {
 
 		      msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
 	    	  Transport.send(msg);
+	    	  logger.debug("Email has been sent successfully to "+to);
 	    	  status.setMessage("Successfully sent an email");
 	    	  status.setStatus("Success");
 		    return status;

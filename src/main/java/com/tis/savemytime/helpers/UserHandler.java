@@ -13,11 +13,15 @@ import java.util.Random;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
+import org.apache.log4j.Logger;
+
 import com.tis.savemytime.models.Status;
 import com.tis.savemytime.models.User;
 
 
 public class UserHandler {
+	
+	private static final Logger logger = Logger.getLogger(UserHandler.class);
 
 	public boolean saveUser(Connection connection, User user) throws Exception {
 		try {
@@ -45,7 +49,7 @@ public class UserHandler {
 			return true;
 		} catch (Exception e) {
 			//throw e;
-			e.printStackTrace();
+			logger.error(e);
 			return false;
 		}
 	}
@@ -65,6 +69,7 @@ public class UserHandler {
 			}
 			return userTransList;
 		} catch (Exception e) {
+			logger.error(e);
 			throw e;
 		}
 	}
@@ -84,7 +89,7 @@ public class UserHandler {
 			}
 			return user;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 			throw e;
 		}
 	}
@@ -104,7 +109,7 @@ public class UserHandler {
 			}
 			return user;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 			return null;
 		}
 		finally {
@@ -113,7 +118,7 @@ public class UserHandler {
 					connection.close();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e);
 					return null;
 				}
 			}
@@ -163,16 +168,19 @@ public class UserHandler {
 					status = EmailHandler.sendEmail(noReplyID,noReplyIDMSG,sslEnable, hostname, hostPort, fromEmail, toEmail, emailSubject, body, password);
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
+					logger.error(e);
 					status.setMessage(" Unsupported encoding.."+e.getMessage());
 					status.setStatus("Failure");
 				}
 			} catch (AddressException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
+				logger.error(e);
 				status.setMessage("Address is not valid.."+e.getMessage());
 				status.setStatus("Failure");
 			} catch (MessagingException e) {
 				// TODO Auto-generated catch block
+				logger.error(e);
 				status.setMessage("Message is not valid.."+e.getMessage());
 				status.setStatus("Failure");
 			}
@@ -212,7 +220,7 @@ public class UserHandler {
 			//return true;
 		} catch (Exception e) {
 			//throw e;
-			e.printStackTrace();
+			logger.error(e);
 			status.setMessage("Failed to saved the records.."+e.getMessage());
 			status.setStatus("Failure");
 		}
@@ -244,8 +252,6 @@ public class UserHandler {
 				status.setStatus("Failure");
 			}
 		}
-		
-		
 		return status;
 	}
 
@@ -298,6 +304,7 @@ public class UserHandler {
 				status.setStatus("Failure");
 			}
 		} catch (Exception e) {
+			logger.error(e);
 			status.setStatus("500");
 			status.setMessage("SQL Exception 358:"+e.getMessage());
 			status.setStatus("Failure");
@@ -323,7 +330,7 @@ public class UserHandler {
 				status.setStatusCode("200");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 			status.setMessage("Something went wrong.."+e.getMessage());
 			status.setStatus("Failure");
 			status.setStatusCode("500");
@@ -350,7 +357,7 @@ public class UserHandler {
 				status.setStatusCode("FU404");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 			status.setMessage("Something went wrong.."+e.getMessage());
 			status.setStatus("Failure");
 			status.setStatusCode("500");
