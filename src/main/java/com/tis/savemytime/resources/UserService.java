@@ -57,7 +57,7 @@ public class UserService {
  					connection.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e);
 			}
  		} 
  		return user;
@@ -75,7 +75,7 @@ public class UserService {
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e);
 			
 		} 
  		finally {
@@ -85,7 +85,7 @@ public class UserService {
  					connection.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e);
 			}
  		} 
  		return status;
@@ -103,7 +103,7 @@ public class UserService {
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e);
 			
 		} 
  		finally {
@@ -132,7 +132,7 @@ public class UserService {
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e);
 			
 		} 
  		finally {
@@ -159,7 +159,7 @@ public class UserService {
 			status =  userHandler.verifyEmail(connection, verifyBean.getUserId(), verifyBean.getAccessToken());	
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e);
 			status.setMessage("exception.."+e.getMessage());
 			status.setStatus("Failure");
 			status.setStatusCode("500");
@@ -171,7 +171,7 @@ public class UserService {
  					connection.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e);
 				status.setMessage("exception.."+e.getMessage());
 				status.setStatus("Failure");
 				status.setStatusCode("500");
@@ -194,7 +194,10 @@ public class UserService {
 		} 
  		finally {
  			try {
+ 				if(connection!=null)
 				connection.close();
+ 				else
+ 					logger.error("Data base connect is null..");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
